@@ -1,106 +1,131 @@
+using System;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+using UnityEngine.Events;
 
-/// <summary>
-/// FishingController - Attach ke GameObject "FishingRod" (gagang pancing)
-/// Mengontrol seluruh mekanik: lempar → tunggu → tarik
-/// </summary>
 public class FishingController : MonoBehaviour
 {
-    [Header("=== OBJECTS (Drag dari Hierarchy) ===")]
-    public Transform rodTip;          // Empty object di ujung gagang pancing
-    public Transform lure;            // Object umpan kamu
-    public LineRenderer fishingLine;  // Line Renderer untuk tali
+    [Header("=== OBJECTS ===")]
+    public Transform rodTip;
+    public Transform lure;
+    public LineRenderer fishingLine;
 
     [Header("=== THROW SETTINGS ===")]
-    public float throwForce = 8f;         // Kekuatan lemparan
-    public float throwAngle = 35f;        // Sudut lemparan (derajat)
-    public LayerMask waterLayer;          // Layer air di scene kamu
+    public float throwForce = 8f;
+    public float throwAngle = 35f;
 
-    [Header("=== WAITING SETTINGS ===")]
-    public float minWaitTime = 2f;        // Waktu minimum sebelum ikan gigit
-    public float maxWaitTime = 6f;        // Waktu maksimum sebelum ikan gigit
-    public float catchWindow = 1.5f;      // Waktu untuk menekan tombol tarik
+    [Header("=== WAIT SETTINGS ===")]
+    public float minWaitTime = 2f;
+    public float maxWaitTime = 6f;
+    public float catchWindow = 1.5f;
 
     [Header("=== LURE SWAY ===")]
-    public float swayAmount = 0.05f;      // Seberapa jauh umpan goyang
-    public float swaySpeed = 1.5f;        // Kecepatan goyang
+    public float swayAmount = 0.05f;
+    public float swaySpeed = 1.5f;
 
-    [Header("=== UI (Opsional, boleh kosong) ===")]
-    public TextMeshProUGUI statusText;    // Text status di UI
-    public GameObject biteIndicator;     // UI tanda ikan gigit (bisa image seru)
+    [Header("=== STATE EVENTS ===")]
+    public UnityEvent onIdle;
+    public UnityEvent onThrowing;
+    public UnityEvent onWaiting;
+    public UnityEvent onBiting;
+    public UnityEvent onReeling;
+    public UnityEvent onSuccess;
+    public UnityEvent onFailed;
 
-    // ─── Private State ───────────────────────────────────────────
+    [Header("=== GENERAL EVENTS ===")]
+    public StringEvent onStatusChanged;
+    public FishingStateEvent onStateChanged;
+
+    [Serializable]
+    public class StringEvent : UnityEvent<string> { }
+
+    [Serializable]
+    public class FishingStateEvent : UnityEvent<FishingState> { }
+
+    public enum FishingState
+    {
+        Idle,
+        Throwing,
+        Waiting,
+        Biting,
+        Reeling,
+        Success,
+        Failed
+    }
+
     private FishingState currentState = FishingState.Idle;
-    private Vector3 lureTargetPosition;
-    private Vector3 lureStartPosition;
-    private float lureThrowProgress = 0f;
-    private float waitTimer = 0f;
-    private float biteTimer = 0f;
-    private float targetWaitTime;
-    private bool lureLanded = false;
-    private Vector3 lureBasePosition; // posisi diam umpan di air
 
     private Rigidbody lureRb;
 
-    // ─── Enum State ──────────────────────────────────────────────
-    public enum FishingState
-    {
-        Idle,       // Diam, belum mancing
-        Throwing,   // Tali sedang dilempar
-        Waiting,    // Umpan di air, menunggu ikan
-        Biting,     // Ikan gigit! Harus tekan tombol
-        Reeling,    // Sedang menarik
-        Success,    // Berhasil dapat ikan
-        Failed      // Gagal (terlambat tekan)
-    }
+    private Vector3 lureStartLocalPosition;
+    private Quaternion lureStartLocalRotation;
+
+    private Vector3 lureBasePosition;
+    private Vector3 lureTargetPosition;
+
+    private float waitTimer;
+    private float biteTimer;
+    private float targetWaitTime;
+
+    private bool lureLanded;
 
     // ─────────────────────────────────────────────────────────────
+    // UNITY
+    // ─────────────────────────────────────────────────────────────
+
     void Start()
     {
         lureRb = lure.GetComponent<Rigidbody>();
 
-        // Simpan posisi awal umpan (menempel di gagang)
-        lureStartPosition = lure.localPosition;
+        lureStartLocalPosition = lure.localPosition;
+        lureStartLocalRotation = lure.localRotation;
 
-        // Sembunyikan bite indicator di awal
-        if (biteIndicator != null)
-            biteIndicator.SetActive(false);
-
-        // Setup Line Renderer
         if (fishingLine != null)
         {
             fishingLine.positionCount = 2;
         }
 
-        UpdateStatusText("Tekan [F] untuk melempar");
+        SetState(FishingState.Idle);
+
+        SendStatus("Press [F] to Fish");
     }
 
     void Update()
     {
         HandleInput();
+        UpdateStateMachine();
         UpdateLineRenderer();
         UpdateLureSway();
-        UpdateStateMachine();
     }
 
-    // ─── INPUT ───────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // INPUT
+    // ─────────────────────────────────────────────────────────────
+
     void HandleInput()
     {
-        // Tekan F untuk lempar / tarik
-        if (Input.GetKeyDown(KeyCode.F))
+        if (!Input.GetKeyDown(KeyCode.F))
+            return;
+
+        switch (currentState)
         {
-            if (currentState == FishingState.Idle)
+            case FishingState.Idle:
                 StartThrow();
-            else if (currentState == FishingState.Biting)
+                break;
+
+            case FishingState.Waiting:
+                CancelFishing();
+                break;
+
+            case FishingState.Biting:
                 StartReeling();
-            else if (currentState == FishingState.Waiting)
-                CancelFishing(); // Tarik paksa tanpa ikan
+                break;
         }
     }
 
-    // ─── STATE MACHINE ───────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // STATE MACHINE
+    // ─────────────────────────────────────────────────────────────
+
     void UpdateStateMachine()
     {
         switch (currentState)
@@ -123,43 +148,60 @@ public class FishingController : MonoBehaviour
 
             case FishingState.Success:
             case FishingState.Failed:
-                // Auto reset setelah 2 detik
+
                 waitTimer += Time.deltaTime;
-                if (waitTimer > 2f)
+
+                if (waitTimer >= 2f)
+                {
                     ResetFishing();
+                }
+
                 break;
         }
     }
 
-    // ─── THROW ───────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // THROW
+    // ─────────────────────────────────────────────────────────────
+
     void StartThrow()
     {
-        currentState = FishingState.Throwing;
+        SetState(FishingState.Throwing);
+
         lureLanded = false;
-        lureThrowProgress = 0f;
 
-        // Hitung titik jatuh umpan di depan player
         Vector3 throwDirection = transform.forward;
-        lureTargetPosition = rodTip.position
-            + throwDirection * throwForce
-            + Vector3.down * 0.5f;
 
-        // Aktifkan physics umpan
+        lureTargetPosition =
+            rodTip.position +
+            throwDirection * throwForce +
+            Vector3.down * 0.5f;
+
+        lure.SetParent(null);
+
         if (lureRb != null)
         {
             lureRb.isKinematic = false;
-            Vector3 velocity = CalculateThrowVelocity(rodTip.position, lureTargetPosition, throwAngle);
+
+            Vector3 velocity =
+                CalculateThrowVelocity(
+                    rodTip.position,
+                    lureTargetPosition,
+                    throwAngle
+                );
+
             lureRb.linearVelocity = velocity;
         }
 
-        lure.SetParent(null); // Lepas dari gagang
-        UpdateStatusText("Tali dilempar...");
+        SendStatus("Casting...");
     }
 
     void UpdateThrow()
     {
-        // Cek apakah umpan sudah menyentuh air / tanah
-        if (lureRb != null && lureRb.linearVelocity.magnitude < 0.5f && !lureLanded)
+        if (lureRb == null)
+            return;
+
+        if (lureRb.linearVelocity.magnitude < 0.5f && !lureLanded)
         {
             lureLanded = true;
             LureLanded();
@@ -168,47 +210,47 @@ public class FishingController : MonoBehaviour
 
     void LureLanded()
     {
-        // Freeze umpan di posisi jatuh
         if (lureRb != null)
         {
             lureRb.isKinematic = true;
         }
 
         lureBasePosition = lure.position;
-        currentState = FishingState.Waiting;
 
-        // Set waktu tunggu random
-        targetWaitTime = Random.Range(minWaitTime, maxWaitTime);
+        targetWaitTime = UnityEngine.Random.Range(minWaitTime, maxWaitTime);
+
         waitTimer = 0f;
 
-        UpdateStatusText("Menunggu ikan... (F = tarik paksa)");
+        SetState(FishingState.Waiting);
+
+        SendStatus("Waiting for fish...");
     }
 
-    // ─── WAITING ─────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // WAITING
+    // ─────────────────────────────────────────────────────────────
+
     void UpdateWaiting()
     {
         waitTimer += Time.deltaTime;
 
         if (waitTimer >= targetWaitTime)
         {
-            TriggerBite();
+            TriggerFishBite();
         }
     }
 
-    // ─── BITE ────────────────────────────────────────────────────
-    void TriggerBite()
+    // ─────────────────────────────────────────────────────────────
+    // BITE
+    // ─────────────────────────────────────────────────────────────
+
+    void TriggerFishBite()
     {
-        currentState = FishingState.Biting;
+        SetState(FishingState.Biting);
+
         biteTimer = 0f;
 
-        if (biteIndicator != null)
-            biteIndicator.SetActive(true);
-
-        // Goyangin umpan lebih kencang saat ikan gigit
-        swayAmount = 0.15f;
-        swaySpeed = 5f;
-
-        UpdateStatusText("⚠ IKAN GIGIT! Tekan [F]!");
+        SendStatus("FISH BITE! PRESS [F]!");
     }
 
     void UpdateBiting()
@@ -217,118 +259,195 @@ public class FishingController : MonoBehaviour
 
         if (biteTimer >= catchWindow)
         {
-            // Terlambat!
             FishingFailed();
         }
     }
 
-    // ─── REELING ─────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // REELING
+    // ─────────────────────────────────────────────────────────────
+
     void StartReeling()
     {
-        currentState = FishingState.Reeling;
+        SetState(FishingState.Reeling);
 
-        if (biteIndicator != null)
-            biteIndicator.SetActive(false);
-
-        UpdateStatusText("Menarik... 🎣");
+        SendStatus("Reeling...");
     }
 
     void UpdateReeling()
     {
-        // Tarik umpan kembali ke ujung gagang
         lure.position = Vector3.MoveTowards(
             lure.position,
             rodTip.position,
             Time.deltaTime * 5f
         );
 
-        // Cek apakah sudah sampai
         if (Vector3.Distance(lure.position, rodTip.position) < 0.1f)
         {
             FishingSuccess();
         }
     }
 
-    // ─── SUCCESS / FAIL ──────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // RESULT
+    // ─────────────────────────────────────────────────────────────
+
     void FishingSuccess()
     {
-        currentState = FishingState.Success;
-        waitTimer = 0f;
-        UpdateStatusText("✅ Dapat ikan!");
+        SetState(FishingState.Success);
 
-        // TODO: Spawn ikan di sini
-        // Contoh: GameManager.instance.AddFish(fishType);
+        waitTimer = 0f;
+
+        SendStatus("Fish Caught!");
     }
 
     void FishingFailed()
     {
-        currentState = FishingState.Failed;
+        SetState(FishingState.Failed);
+
         waitTimer = 0f;
 
-        if (biteIndicator != null)
-            biteIndicator.SetActive(false);
-
-        UpdateStatusText("❌ Ikan kabur...");
-
-        // Reset sway
-        swayAmount = 0.05f;
-        swaySpeed = 1.5f;
+        SendStatus("Fish Escaped!");
     }
 
     void CancelFishing()
     {
-        currentState = FishingState.Reeling;
-        UpdateStatusText("Menarik tali...");
+        SetState(FishingState.Reeling);
+
+        SendStatus("Cancelled Fishing");
     }
+
+    // ─────────────────────────────────────────────────────────────
+    // RESET
+    // ─────────────────────────────────────────────────────────────
 
     void ResetFishing()
     {
-        // Kembalikan umpan ke gagang
         lure.SetParent(transform);
-        lure.localPosition = lureStartPosition;
-        lure.localRotation = Quaternion.identity;
+
+        lure.localPosition = lureStartLocalPosition;
+        lure.localRotation = lureStartLocalRotation;
 
         if (lureRb != null)
+        {
             lureRb.isKinematic = true;
+            lureRb.linearVelocity = Vector3.zero;
+            lureRb.angularVelocity = Vector3.zero;
+        }
 
-        // Reset sway
-        swayAmount = 0.05f;
-        swaySpeed = 1.5f;
+        SetState(FishingState.Idle);
 
-        currentState = FishingState.Idle;
-        UpdateStatusText("Tekan [F] untuk melempar");
+        SendStatus("Press [F] to Fish");
     }
 
-    // ─── LURE SWAY ───────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // SWAY
+    // ─────────────────────────────────────────────────────────────
+
     void UpdateLureSway()
     {
-        if (currentState != FishingState.Waiting && currentState != FishingState.Biting)
+        if (currentState != FishingState.Waiting &&
+            currentState != FishingState.Biting)
             return;
 
-        float swayX = Mathf.Sin(Time.time * swaySpeed) * swayAmount;
-        float swayZ = Mathf.Cos(Time.time * swaySpeed * 0.7f) * swayAmount * 0.5f;
+        float swayX =
+            Mathf.Sin(Time.time * swaySpeed) * swayAmount;
 
-        lure.position = lureBasePosition + new Vector3(swayX, 0f, swayZ);
+        float swayZ =
+            Mathf.Cos(Time.time * swaySpeed * 0.7f)
+            * swayAmount
+            * 0.5f;
+
+        lure.position =
+            lureBasePosition +
+            new Vector3(swayX, 0f, swayZ);
     }
 
-    // ─── LINE RENDERER ───────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // LINE
+    // ─────────────────────────────────────────────────────────────
+
     void UpdateLineRenderer()
     {
-        if (fishingLine == null) return;
+        if (fishingLine == null)
+            return;
 
         fishingLine.SetPosition(0, rodTip.position);
         fishingLine.SetPosition(1, lure.position);
     }
 
-    // ─── HELPER ──────────────────────────────────────────────────
-    Vector3 CalculateThrowVelocity(Vector3 from, Vector3 to, float angle)
+    // ─────────────────────────────────────────────────────────────
+    // STATE EVENTS
+    // ─────────────────────────────────────────────────────────────
+
+    void SetState(FishingState newState)
+    {
+        currentState = newState;
+
+        onStateChanged?.Invoke(currentState);
+
+        switch (currentState)
+        {
+            case FishingState.Idle:
+                onIdle?.Invoke();
+                break;
+
+            case FishingState.Throwing:
+                onThrowing?.Invoke();
+                break;
+
+            case FishingState.Waiting:
+                onWaiting?.Invoke();
+                break;
+
+            case FishingState.Biting:
+                onBiting?.Invoke();
+                break;
+
+            case FishingState.Reeling:
+                onReeling?.Invoke();
+                break;
+
+            case FishingState.Success:
+                onSuccess?.Invoke();
+                break;
+
+            case FishingState.Failed:
+                onFailed?.Invoke();
+                break;
+        }
+    }
+
+    void SendStatus(string message)
+    {
+        Debug.Log("[Fishing] " + message);
+
+        onStatusChanged?.Invoke(message);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // HELPERS
+    // ─────────────────────────────────────────────────────────────
+
+    Vector3 CalculateThrowVelocity(
+        Vector3 from,
+        Vector3 to,
+        float angle
+    )
     {
         Vector3 direction = to - from;
-        float distance = new Vector3(direction.x, 0f, direction.z).magnitude;
+
+        float distance =
+            new Vector3(direction.x, 0f, direction.z).magnitude;
+
         float angleRad = angle * Mathf.Deg2Rad;
 
-        float velocityY = Mathf.Tan(angleRad) * distance;
-        float time = distance / (Mathf.Cos(angleRad) * throwForce);
+        float velocityY =
+            Mathf.Tan(angleRad) * distance;
+
+        float time =
+            distance /
+            (Mathf.Cos(angleRad) * throwForce);
 
         return new Vector3(
             direction.normalized.x * throwForce,
@@ -337,15 +456,17 @@ public class FishingController : MonoBehaviour
         );
     }
 
-    void UpdateStatusText(string message)
+    // ─────────────────────────────────────────────────────────────
+    // PUBLIC
+    // ─────────────────────────────────────────────────────────────
+
+    public FishingState GetState()
     {
-        if (statusText != null)
-            statusText.text = message;
-        else
-            Debug.Log("[Fishing] " + message);
+        return currentState;
     }
 
-    // ─── PUBLIC GETTER (untuk script lain) ───────────────────────
-    public FishingState GetState() => currentState;
-    public bool IsIdle() => currentState == FishingState.Idle;
+    public bool IsIdle()
+    {
+        return currentState == FishingState.Idle;
+    }
 }
