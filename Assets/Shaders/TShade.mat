@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7465906547191187182
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Editor::UnityEditor.Rendering.Universal.AssetVersion
+  version: 10
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: TShade
+  m_Shader: {fileID: -6465566751694194690, guid: 04be5e7adfcebe249b95a9cc16eaeddd, type: 3}
+  m_Parent: {fileID: 2100000, guid: d60cfc20d2f4c1e4e9510b8c0393383a, type: 2}
+  m_ModifiedSerializedProperties: 2
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - _CUSTOMWIND_ON
+  - _TERRAIN_INSTANCED_PERPIXEL_NORMAL
+  - _TRANSLUCENCYONOFF_ON
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Texture:
+        m_Texture: {fileID: 2800000, guid: d2f321fff7f05aa49ad106541e997dd3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AlphaEdge1: 1.2
+    - _AlphaEdge2: 0.29
+    - _Alpha_clip: 7.25
+    - _Ambient: 0.94
+    - _MinBrightness: 1.3
+    - _Scale: 0.47
+    - _Strength: 0.3
+    m_Colors:
+    - _ColorA: {r: 0.12947577, g: 0.5660378, b: 0.0026699959, a: 0}
+    - _ColorB: {r: 1, g: 1, b: 1, a: 0}
+    - _Main_Light_Direction: {r: 0, g: -1, b: 0, a: 0}
+    - _ShadowColor: {r: 0.17998785, g: 0.46226418, b: 0.071956225, a: 1}
+    - _Speed: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

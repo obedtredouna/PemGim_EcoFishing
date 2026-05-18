@@ -1,0 +1,229 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7667987252412908428
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Editor::UnityEditor.Rendering.Universal.AssetVersion
+  version: 10
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: OMG
+  m_Shader: {fileID: 4800000, guid: 46b13020fd660304ea6b95409432a421, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _TRANSLUCENCYONOFF_ON
+  m_InvalidKeywords:
+  - _CUSTOMCOLORSTINTING_ON
+  - _CUSTOMWIND_ON
+  - _GRADIENTMODE_LOCALY
+  - _TERRAIN_INSTANCED_PERPIXEL_NORMAL
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseTexture:
+        m_Texture: {fileID: 2800000, guid: d2f321fff7f05aa49ad106541e997dd3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BlackTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DefaultWhiteTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: d2f321fff7f05aa49ad106541e997dd3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalBlank:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_930fe5038ed845f396be25098535f860_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: fad7e3ec6fab7e34e91327f8b9ac5bd7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_d03f30afa1df4db8b6cc0130fb88db30_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 1b4e3fdc9956a1145a654b98b3536bb9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TerrainHolesTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AlphaCutoff: 0.5
+    - _AlphaEdge1: -0.79
+    - _AlphaEdge2: 0.82
+    - _AlphaSoftness: 0
+    - _AmbientStrength: 2
+    - _BriShiftMax: 0
+    - _BriShiftMin: 0
+    - _Brightness: 1.52
+    - _CUSTOMCOLORSTINTING: 1
+    - _CUSTOMWIND: 1
+    - _Cutoff: 0.477
+    - _DarkWidth: 0.357
+    - _DiffuseStrength: 1
+    - _EdgeSoftness: 0.2
+    - _EnableInstancedPerPixelNormal: 1
+    - _EnvironmentReflections: 1
+    - _FlipWindUV: 0
+    - _Gradient: 1.3
+    - _GradientMode: 0
+    - _GradientOffset: -1
+    - _GradientPower: 10
+    - _GradientRotate: 232
+    - _HueShiftMax: -0.043
+    - _HueShiftMin: 0.005
+    - _LeafSeedSource: 0
+    - _LeafShadowSoftness: 0
+    - _LeafVariationSeed: 55.1
+    - _LeafVariationStrength: 0.044
+    - _LeavesThickness: 0.58
+    - _LightBias: 1
+    - _LightFlatten: 0.367
+    - _Metallic0: 0
+    - _Metallic1: 0
+    - _Metallic2: 0
+    - _Metallic3: 0
+    - _MidWidth: 0.191
+    - _MinBrightness: 0.39
+    - _MinLight: 0.672
+    - _QueueControl: -1
+    - _QueueOffset: 0
+    - _RadialAspect: 1
+    - _RadialAspectY: 1.2
+    - _RadialCenterU: 0.5
+    - _RadialCenterV: 0.3
+    - _RadialRadius: 9.3
+    - _RadialWorldX: 0
+    - _RadialWorldY: 0
+    - _RadialWorldZ: 0
+    - _ReceiveShadows: 1
+    - _SNOWONOFF: 0
+    - _SatShiftMax: 0
+    - _SatShiftMin: -0.1
+    - _Scale: 1
+    - _ShadowBlend: 0.052
+    - _ShadowSoftness: 2.38
+    - _ShadowStrength: 0.209
+    - _Smoothness: 0
+    - _Smoothness0: 1
+    - _Smoothness1: 1
+    - _Smoothness2: 1
+    - _Smoothness3: 1
+    - _SnowAmount: 0.426
+    - _SnowCoverage: 0.45
+    - _SnowGradient: 0.087
+    - _SpecularHighlights: 1
+    - _Speed: 1
+    - _Strength: 0.3
+    - _TRANSLUCENCYONOFF: 1
+    - _TintStrength: 1
+    - _TransAmbient: 0.13
+    - _TransDirect: 1
+    - _TransNormal: 1
+    - _TransScattering: 8.7
+    - _TransShadow: 0.6
+    - _TransStrength: 50
+    - _UseCustomAmbient: 0
+    - _WindDensity: 1.44
+    - _WindHeightMask: 5
+    - _WindMovement: 2.25
+    - _WindPhaseOffset: 10
+    - _WindSpeed: 3.48
+    - _WindStrength: 0.001
+    - _WindTurbulence: 4.92
+    m_Colors:
+    - _AmbientColor: {r: 0, g: 0, b: 0, a: 0}
+    - _BrightColor: {r: 0.44348505, g: 1, b: 0.15566039, a: 1}
+    - _BrightColorA: {r: 0.16862741, g: 0.482, b: 0.16862741, a: 1}
+    - _BrightColorB: {r: 0.16803133, g: 0.6037736, b: 0.16803133, a: 1}
+    - _Color: {r: 0.18039216, g: 0.4627451, b: 0.07058824, a: 1}
+    - _ColorA: {r: 0, g: 0.5660378, b: 0.03903704, a: 1}
+    - _ColorB: {r: 0.23696157, g: 0.7075472, b: 0.23696157, a: 1}
+    - _DarkColor: {r: 0.16873917, g: 0.6226415, b: 0.16153437, a: 1}
+    - _DarkColorA: {r: 0.04312025, g: 0.539, b: 0.04312025, a: 1}
+    - _DarkColorB: {r: 0.043137193, g: 0.539, b: 0.043137193, a: 1}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _GroundColor: {r: 0.16995007, g: 0.46226418, b: 0.115566045, a: 1}
+    - _MidColor: {r: 0.25471702, g: 0.745283, b: 0, a: 1}
+    - _MidColorA: {r: 0.043137193, g: 0.61, b: 0.043137193, a: 1}
+    - _MidColorB: {r: 0.043137193, g: 0.545, b: 0.043137193, a: 1}
+    - _ShadowColor: {r: 0.06074228, g: 0.990566, b: 0.06074228, a: 1}
+    - _TopColor: {r: 0.07990751, g: 0.5566038, b: 0.07613921, a: 1}
+    - _WindDirection: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
